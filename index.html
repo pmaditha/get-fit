@@ -62,7 +62,23 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
 .eyebrow{font-size:11.5px;color:var(--mut);letter-spacing:.14em;text-transform:uppercase;font-weight:600}
 .date{font-family:'Fraunces',serif;font-size:31px;font-weight:600;letter-spacing:-.02em;margin-top:3px}
 .badge{background:linear-gradient(135deg,var(--gold),var(--mango),var(--gold2));background-size:180% 180%;color:#3a2c05;font-weight:700;
-   font-size:12px;padding:9px 14px;border-radius:30px;box-shadow:0 8px 22px rgba(233,185,73,.32);animation:glowPulse 3.4s ease-in-out infinite,slideGrad 7s linear infinite}
+   font-size:12px;padding:9px 14px;border-radius:30px;box-shadow:0 8px 22px rgba(233,185,73,.32);animation:glowPulse 3.4s ease-in-out infinite,slideGrad 7s linear infinite;cursor:pointer;transition:transform .15s var(--ease)}
+.badge:active{transform:scale(.93)}
+.badge.bpaused{background:linear-gradient(135deg,var(--leaf),var(--leaf2));color:#06291a;box-shadow:0 8px 22px rgba(67,217,163,.3);animation:slideGrad 7s linear infinite}
+.badge.bidle{background:rgba(255,255,255,.08);color:var(--mut);box-shadow:none;border:1px solid var(--line2);animation:none}
+
+/* plan start / pause banner */
+.planbar{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.planbar .pb-left{min-width:0}
+.planbar .pb-state{font-family:'Fraunces',serif;font-weight:600;font-size:17px;line-height:1.15}
+.planbar .pb-sub{font-size:12px;color:var(--mut);margin-top:3px;line-height:1.35}
+.planbar .pb-reset{font-size:11px;color:var(--mut2);background:none;border:none;padding:0;margin-top:7px;text-decoration:underline;text-underline-offset:2px}
+.pb-btn{flex:0 0 auto;border:none;border-radius:14px;padding:13px 20px;font-weight:700;font-size:13.5px;color:#1a1330;
+   background:linear-gradient(135deg,var(--gold),var(--gold2));background-size:180% 180%;animation:slideGrad 6s linear infinite;
+   box-shadow:0 8px 20px rgba(245,196,81,.3);transition:transform .15s var(--ease)}
+.pb-btn:active{transform:scale(.94)}
+.pb-btn.running{background:linear-gradient(135deg,var(--sky),#a6e0fa);box-shadow:0 8px 20px rgba(86,194,240,.3)}
+.pb-btn.paused{background:linear-gradient(135deg,var(--leaf),var(--leaf2));box-shadow:0 8px 20px rgba(67,217,163,.3)}
 
 /* ============================================================
    cards
@@ -383,7 +399,7 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
       </div>
       <button class="jumptoday" id="jumpToday" style="display:none" onclick="gotoToday()">→ Jump to today</button>
     </div>
-    <div class="badge" id="phaseBadge">Phase 1</div>
+    <div class="badge" id="phaseBadge" onclick="go('coach')" title="Manage plan">Phase 1</div>
   </header>
 
   <div class="sectitle">Nutrition</div>
@@ -533,6 +549,17 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
 <!-- ============ COACH ============ -->
 <section class="screen" id="s-coach">
   <header class="top"><div><div class="eyebrow">Foodie-friendly</div><div class="date">Coach</div></div></header>
+
+  <div class="sectitle">Your 13-week plan</div>
+  <div class="card planbar acc-gold" id="planBar">
+    <div class="pb-left">
+      <div class="pb-state" id="pbState">Plan not started</div>
+      <div class="pb-sub" id="pbSub">13-week cut · begin when you’re ready</div>
+      <button class="pb-reset" id="pbReset" style="display:none" onclick="resetPlan()">Reset plan</button>
+    </div>
+    <button class="pb-btn" id="pbBtn" onclick="togglePlan()">Start plan</button>
+  </div>
+
   <div class="sectitle">Quick high-protein snacks</div>
   <div id="snackList"></div>
   <div class="sectitle">When hunger hits</div>
@@ -858,7 +885,16 @@ function dayKey(){return viewDate||todayKey();}
 function isToday(){return dayKey()===todayKey();}
 function fmtDate(k){const dt=k?new Date(k+'T00:00:00'):new Date();return dt.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});}
 function dayIndex(d){return Math.round((new Date(d+'T00:00:00')-new Date(S.start+'T00:00:00'))/86400000);}
-function currentWeek(k){return Math.max(1,Math.floor(dayIndex(k||todayKey())/7)+1);}
+function daysBetween(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function planObj(){if(!S.meta.plan)S.meta.plan={state:'idle',start:null,paused:0,pausedAt:null};return S.meta.plan;}
+function planStarted(){return planObj().state!=='idle';}
+function planElapsed(k){
+  const p=planObj();if(!p.start)return 0;k=k||todayKey();if(k<p.start)return 0;
+  let paused=p.paused||0;
+  if(p.state==='paused'&&p.pausedAt&&k>p.pausedAt)paused+=daysBetween(p.pausedAt,k);
+  return Math.max(0,daysBetween(p.start,k)-paused);
+}
+function currentWeek(k){if(!planStarted())return 1;return Math.max(1,Math.floor(planElapsed(k)/7)+1);}
 function currentPhase(k){const wk=currentWeek(k);return PHASES.find(p=>wk>=p.from&&wk<=p.to)||PHASES[PHASES.length-1];}
 function getTarget(k){const p=currentPhase(k);return{cal:p.cal,pro:p.pro,carb:p.carb,fat:p.fat};}
 function curWeight(){return S.weights.length?S.weights[S.weights.length-1].w:START;}
@@ -922,6 +958,7 @@ function go(s){
   if(s==='today')renderToday();
   if(s==='progress')renderProgress();
   if(s==='workout')renderWorkout();
+  if(s==='coach')renderCoach();
   if(s==='insights')renderInsights();
   window.scrollTo(0,0);
 }
@@ -933,7 +970,11 @@ function renderToday(){
   el('todayDate').textContent=isToday()?fmtDate():fmtDate(k);
   renderDateNav();
   const T=getTarget(k),ph=currentPhase(k),wk=currentWeek(k),t=totals();
-  el('phaseBadge').textContent=ph.label;
+  const badge=el('phaseBadge');
+  const pl=planObj();
+  if(pl.state==='active'){badge.textContent=`${ph.label} · W${Math.min(wk,PLAN_WEEKS)}`;badge.className='badge';}
+  else if(pl.state==='paused'){badge.textContent=`Paused · W${Math.min(wk,PLAN_WEEKS)}`;badge.className='badge bpaused';}
+  else{badge.textContent='Tap to start';badge.className='badge bidle';}
   const C=364.4,pct=Math.min(t.cal/T.cal,1);
   const ring=el('calRing');
   ring.style.strokeDashoffset=C-C*pct;
@@ -975,7 +1016,60 @@ function stepDay(d){
   renderToday();
 }
 function gotoToday(){viewDate=null;renderToday();}
+
+/* ---------------- PLAN: start / pause ---------------- */
+function renderPlanBar(){
+  const p=planObj(),bar=el('planBar'),st=el('pbState'),sub=el('pbSub'),btn=el('pbBtn'),rst=el('pbReset');
+  bar.classList.remove('acc-gold','acc-sky','acc-leaf');
+  if(p.state==='active'){
+    const wk=Math.min(currentWeek(),PLAN_WEEKS),ph=currentPhase();
+    bar.classList.add('acc-sky');
+    st.textContent=`Week ${wk} of ${PLAN_WEEKS} · ${ph.label}`;
+    sub.textContent='Plan running · tap to pause anytime';
+    btn.textContent='Pause';btn.className='pb-btn running';rst.style.display='';
+  }else if(p.state==='paused'){
+    const wk=Math.min(currentWeek(),PLAN_WEEKS);
+    bar.classList.add('acc-leaf');
+    st.textContent=`Paused · Week ${wk}`;
+    sub.textContent='Timer frozen · resume when you’re back on track';
+    btn.textContent='Resume';btn.className='pb-btn paused';rst.style.display='';
+  }else{
+    bar.classList.add('acc-gold');
+    st.textContent='Plan not started';
+    sub.textContent=`${PLAN_WEEKS}-week cut · begin when you’re ready`;
+    btn.textContent='Start plan';btn.className='pb-btn';rst.style.display='none';
+  }
+}
+function togglePlan(){
+  const p=planObj();
+  if(p.state==='idle'){
+    p.state='active';p.start=todayKey();p.paused=0;p.pausedAt=null;
+    persist('meta');renderPlanBar();renderToday();toast('Plan started — Week 1 begins today 🎯');
+  }else if(p.state==='active'){
+    p.state='paused';p.pausedAt=todayKey();
+    persist('meta');renderPlanBar();renderToday();toast('Plan paused — week timer frozen');
+  }else{
+    if(p.pausedAt)p.paused=(p.paused||0)+daysBetween(p.pausedAt,todayKey());
+    p.state='active';p.pausedAt=null;
+    persist('meta');renderPlanBar();renderToday();toast('Plan resumed — welcome back 💪');
+  }
+}
+function resetPlan(){
+  toast('Reset plan back to not started?','Reset',()=>{
+    S.meta.plan={state:'idle',start:null,paused:0,pausedAt:null};
+    persist('meta');renderPlanBar();renderToday();toast('Plan reset');
+  });
+}
 function renderPhaseStrip(T,ph,wk){
+  if(!planStarted()){
+    el('phaseStrip').innerHTML=`<div class="pi">
+      <div class="pname">Preview · Phase 1 targets</div>
+      <div class="pmeta">Start the plan above to begin Week 1 and unlock auto-adapting targets</div>
+      <div class="phasedots">${PHASES.map(p=>`<div class="pd">P${p.n} · ${p.cal}</div>`).join('')}</div>
+    </div>
+    <div><div class="ptarget">${T.cal}</div><div class="ptlbl">kcal preview</div></div>`;
+    return;
+  }
   const wkIn=Math.min(wk,PLAN_WEEKS),prog=Math.min(wk/PLAN_WEEKS,1)*100;
   const dots=PHASES.map(p=>{const cls=wk>p.to?'pd done':((wk>=p.from&&wk<=p.to)?'pd on':'pd');return`<div class="${cls}">P${p.n} · ${p.cal}</div>`;}).join('');
   const ps=paceStatus();
@@ -1326,6 +1420,7 @@ function markWorkout(){const d=todayKey();if(!S.workouts.includes(d)){S.workouts
 
 /* ---------------- COACH ---------------- */
 function renderCoach(){
+  renderPlanBar();
   el('snackList').innerHTML=SNACKS.map(([n,cal,pro,why])=>
     `<div class="lcard"><div class="lt">${n}<span class="lp">${pro}g protein</span></div><div class="ld">${why}</div><div class="lc">${cal} kcal</div></div>`).join('');
 }

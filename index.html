@@ -879,7 +879,8 @@ ensureStart();
 
 /* ---------------- UTIL ---------------- */
 const el=id=>document.getElementById(id);
-function todayKey(){return new Date().toISOString().slice(0,10);}
+function isoLocal(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function todayKey(){return isoLocal(new Date());}
 let viewDate=null;                       // null = today; else 'YYYY-MM-DD' being edited
 function dayKey(){return viewDate||todayKey();}
 function isToday(){return dayKey()===todayKey();}
@@ -916,7 +917,7 @@ function linReg(pts,key){const n=pts.length;let sx=0,sy=0,sxx=0,sxy=0;
 function logStreak(){
   let s=0;const d=new Date();
   if(!(S.logs[todayKey()]||[]).length)d.setDate(d.getDate()-1);
-  while((S.logs[d.toISOString().slice(0,10)]||[]).length){s++;d.setDate(d.getDate()-1);}
+  while((S.logs[isoLocal(d)]||[]).length){s++;d.setDate(d.getDate()-1);}
   return s;
 }
 function emaReg(){
@@ -1010,7 +1011,7 @@ function renderDateNav(){
 }
 function stepDay(d){
   const cur=new Date(dayKey()+'T00:00:00');cur.setDate(cur.getDate()+d);
-  const k=cur.toISOString().slice(0,10);
+  const k=isoLocal(cur);
   if(k>todayKey())return;
   viewDate=(k===todayKey())?null:k;
   renderToday();
@@ -1431,7 +1432,7 @@ function renderInsights(){renderCheckin();renderWeightChart();renderDeficit();re
 function renderCheckin(){
   const box=el('checkinBox');
   const t=new Date(),last7=[];
-  for(let i=0;i<7;i++){const d=new Date(t);d.setDate(d.getDate()-i);last7.push(d.toISOString().slice(0,10));}
+  for(let i=0;i<7;i++){const d=new Date(t);d.setDate(d.getDate()-i);last7.push(isoLocal(d));}
   let calSum=0,calN=0,proHits=0,waterSum=0,waterN=0,cardioSum=0,woN=0;
   last7.forEach(d=>{
     if((S.logs[d]||[]).length){const dt=dayTot(d);calSum+=dt.cal;calN++;if(dt.pro>=PRO_HIT)proHits++;}

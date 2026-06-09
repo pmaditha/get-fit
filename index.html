@@ -18,11 +18,11 @@
    LeanPath — design tokens
    ============================================================ */
 :root{
-  --bg:#07271d; --bg2:#0a3d2e; --card:#0f4636; --card2:#13533f;
-  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.15);
-  --txt:#f4f1e8; --mut:#9fc4b3; --mut2:#6b9685;
-  --gold:#e9b949; --gold2:#f2cd6b; --mango:#f59e3c;
-  --leaf:#5bbf7a; --leaf2:#83d99c; --berry:#d96b78; --sky:#6cb6d9; --violet:#b58bd6;
+  --bg:#0e0f1e; --bg2:#171a33; --card:#1b1e3a; --card2:#222748;
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
+  --txt:#f5f2ee; --mut:#b3b6d6; --mut2:#7e83ad;
+  --gold:#f5c451; --gold2:#ffd97a; --mango:#ff8a4c;
+  --leaf:#43d9a3; --leaf2:#7fe9c4; --berry:#ff6b9d; --sky:#56c2f0; --violet:#a98bff;
   --rad:24px; --rad2:16px; --rad3:13px;
   --sh:0 14px 38px rgba(0,0,0,.32); --sh2:0 6px 20px rgba(0,0,0,.28);
   --spring:cubic-bezier(.34,1.4,.5,1); --ease:cubic-bezier(.4,0,.2,1);
@@ -36,11 +36,11 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
 
 .bgwrap{position:fixed;inset:0;z-index:-2;overflow:hidden;background:
-   radial-gradient(125% 80% at 82% -12%, #1c7e5e 0%, transparent 56%),
-   radial-gradient(105% 72% at -5% 112%, #0c4634 0%, transparent 52%),
-   radial-gradient(70% 55% at 100% 60%, rgba(181,139,214,.10), transparent 60%),
-   radial-gradient(70% 55% at 0% 30%, rgba(108,182,217,.08), transparent 60%),
-   linear-gradient(180deg,#07271d,#051a13);}
+   radial-gradient(120% 80% at 80% -10%, #2a2f6e 0%, transparent 55%),
+   radial-gradient(100% 72% at -5% 112%, #1a2350 0%, transparent 52%),
+   radial-gradient(70% 55% at 100% 58%, rgba(169,139,255,.16), transparent 60%),
+   radial-gradient(72% 55% at 0% 32%, rgba(86,194,240,.13), transparent 60%),
+   linear-gradient(180deg,#0e0f1e,#080916);}
 .grain{position:fixed;inset:0;z-index:-1;opacity:.045;pointer-events:none;
    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
 
@@ -72,7 +72,9 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
 .card::before{content:"";position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent)}
 .card h2{font-family:'Fraunces',serif;font-weight:600;font-size:19px;letter-spacing:-.01em}
 .card .sub{color:var(--mut);font-size:13px;margin:3px 0 16px}
-.sectitle{font-family:'Fraunces',serif;font-size:15px;color:var(--mut);margin:24px 4px 13px;font-weight:500;letter-spacing:.01em}
+.sectitle{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-size:16px;color:var(--txt);margin:26px 4px 14px;font-weight:600;letter-spacing:.01em}
+.sectitle::before{content:"";width:20px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--mango));flex:0 0 auto}
+.sectitle .scount{margin-left:auto;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--mut2);letter-spacing:.04em}
 
 /* calorie ring */
 .ring-wrap{display:flex;align-items:center;gap:20px}
@@ -290,6 +292,7 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
 .qtyrow button{width:50px;height:50px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.05);font-size:26px;transition:transform .15s var(--ease)}
 .qtyrow button:active{transform:scale(.9);background:rgba(233,185,73,.16)}
 .qtyrow .qv{font-family:'Fraunces',serif;font-size:32px;font-weight:700;min-width:74px;text-align:center}
+.qtypresets{justify-content:center;margin:0 0 4px}
 .qtymac{text-align:center;font-size:12.5px;color:var(--mut);margin-bottom:18px}
 .confirm{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#3a2c05;border:none;font-weight:700;font-size:15px;padding:16px;border-radius:16px;transition:transform .15s var(--ease)}
 .confirm:active{transform:scale(.98)}
@@ -322,15 +325,19 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
 @keyframes popIn{0%{opacity:0;transform:scale(.8) translateY(8px)}60%{opacity:1;transform:scale(1.06)}100%{transform:scale(1) translateY(0)}}
 
 /* floating colorful blobs behind everything */
-.bgwrap::before,.bgwrap::after{content:"";position:absolute;border-radius:50%;filter:blur(64px);opacity:.45;mix-blend-mode:screen;pointer-events:none}
-.bgwrap::before{width:58vw;height:58vw;left:-14vw;top:6vh;background:radial-gradient(circle,#22a079,transparent 68%);animation:floatBlob 24s ease-in-out infinite}
-.bgwrap::after{width:50vw;height:50vw;right:-16vw;bottom:2vh;background:radial-gradient(circle,#d6a93f,transparent 70%);animation:floatBlob 30s ease-in-out infinite reverse}
+.bgwrap::before,.bgwrap::after{content:"";position:absolute;border-radius:50%;filter:blur(64px);opacity:.5;mix-blend-mode:screen;pointer-events:none}
+.bgwrap::before{width:58vw;height:58vw;left:-14vw;top:6vh;background:radial-gradient(circle,#7b5cff,transparent 68%);animation:floatBlob 24s ease-in-out infinite}
+.bgwrap::after{width:52vw;height:52vw;right:-16vw;bottom:2vh;background:radial-gradient(circle,#ff7eb3,transparent 70%);animation:floatBlob 30s ease-in-out infinite reverse}
 
-/* animated rainbow card top edge + soft sheen sweep */
-.card::before{height:2px!important;background:linear-gradient(90deg,var(--gold),var(--leaf),var(--sky),var(--violet),var(--mango),var(--gold))!important;
-   background-size:300% 100%!important;animation:slideGrad 9s linear infinite;opacity:.95}
-.card::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:42%;
-   background:linear-gradient(100deg,transparent,rgba(255,255,255,.09),transparent);transform:skewX(-18deg);pointer-events:none;animation:sheen 9s ease-in-out 1.4s infinite}
+/* per-category accent top bar (no glossy sweep) */
+.card::before{height:3px!important;border-radius:3px;background:linear-gradient(90deg,var(--accent,var(--gold)),transparent 78%)!important;opacity:.95}
+.card.acc-gold{--accent:var(--gold2)}
+.card.acc-sky{--accent:var(--sky)}
+.card.acc-leaf{--accent:var(--leaf2)}
+.card.acc-violet{--accent:var(--violet)}
+.card.acc-berry{--accent:var(--berry)}
+.card[class*=acc-] .trk-val,.card[class*=acc-] .fasttime{color:var(--accent)}
+.card[class*=acc-] .trk-head h2{color:var(--accent);opacity:.95}
 
 /* glowing calorie ring + gently floating number */
 .ring svg{animation:ringGlow 3.8s ease-in-out infinite}
@@ -379,7 +386,9 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
     <div class="badge" id="phaseBadge">Phase 1</div>
   </header>
 
-  <div class="card">
+  <div class="sectitle">Nutrition</div>
+
+  <div class="card acc-gold">
     <div class="ring-wrap">
       <div class="ring">
         <svg width="132" height="132" viewBox="0 0 132 132">
@@ -404,46 +413,6 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
 
   <div class="card phasecard" id="phaseStrip"></div>
 
-  <div class="card">
-    <div class="trk-head"><h2>Water</h2><div class="trk-val" id="waterVal">0 / 8</div></div>
-    <div class="wdots" id="waterDots"></div>
-    <div class="trkbtns">
-      <button class="minus" onclick="bumpWater(-1)">−</button>
-      <button onclick="bumpWater(1)">+ Glass (250 ml)</button>
-    </div>
-    <div class="trknote" id="waterNote"></div>
-  </div>
-
-  <div class="card">
-    <div class="trk-head"><h2>Cardio</h2><div class="trk-val" id="cardioVal">0 min</div></div>
-    <div class="trkbtns">
-      <button class="minus" onclick="bumpCardio(-5)">−5</button>
-      <button onclick="bumpCardio(10)">+10</button>
-      <button onclick="bumpCardio(20)">+20</button>
-      <button onclick="bumpCardio(30)">+30</button>
-    </div>
-    <div class="trknote" id="cardioNote"></div>
-  </div>
-
-  <div class="card" id="fastCard">
-    <div class="trk-head"><h2>Fasting</h2><div class="fasttime" id="fastTime">—</div></div>
-    <div class="trkbtns">
-      <button id="fastBtn" onclick="toggleFast()">Start fast</button>
-    </div>
-    <div class="trknote" id="fastNote"></div>
-  </div>
-
-  <div class="card" id="sleepCard">
-    <div class="trk-head"><h2>Sleep &amp; energy</h2><div class="trk-val" id="sleepVal">—</div></div>
-    <div class="wt-input" style="margin-top:0">
-      <input type="number" inputmode="decimal" id="sleepIn" placeholder="Hours slept">
-      <button onclick="logSleep()">Save</button>
-    </div>
-    <div class="flbl" style="margin:14px 4px 0">Energy today</div>
-    <div class="engrid" id="energyGrid"></div>
-    <div class="trknote" id="sleepNote"></div>
-  </div>
-
   <div class="card" id="quickCard">
     <div class="qahead">
       <h2 style="font-size:17px">Quick add</h2>
@@ -461,6 +430,48 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
   </div>
 
   <div id="mealsWrap"></div>
+
+  <div class="sectitle">Wellness</div>
+
+  <div class="card acc-sky">
+    <div class="trk-head"><h2>Water</h2><div class="trk-val" id="waterVal">0 / 8</div></div>
+    <div class="wdots" id="waterDots"></div>
+    <div class="trkbtns">
+      <button class="minus" onclick="bumpWater(-1)">−</button>
+      <button onclick="bumpWater(1)">+ Glass (250 ml)</button>
+    </div>
+    <div class="trknote" id="waterNote"></div>
+  </div>
+
+  <div class="card acc-leaf">
+    <div class="trk-head"><h2>Cardio</h2><div class="trk-val" id="cardioVal">0 min</div></div>
+    <div class="trkbtns">
+      <button class="minus" onclick="bumpCardio(-5)">−5</button>
+      <button onclick="bumpCardio(10)">+10</button>
+      <button onclick="bumpCardio(20)">+20</button>
+      <button onclick="bumpCardio(30)">+30</button>
+    </div>
+    <div class="trknote" id="cardioNote"></div>
+  </div>
+
+  <div class="card acc-violet" id="fastCard">
+    <div class="trk-head"><h2>Fasting</h2><div class="fasttime" id="fastTime">—</div></div>
+    <div class="trkbtns">
+      <button id="fastBtn" onclick="toggleFast()">Start fast</button>
+    </div>
+    <div class="trknote" id="fastNote"></div>
+  </div>
+
+  <div class="card acc-berry" id="sleepCard">
+    <div class="trk-head"><h2>Sleep &amp; energy</h2><div class="trk-val" id="sleepVal">—</div></div>
+    <div class="wt-input" style="margin-top:0">
+      <input type="number" inputmode="decimal" id="sleepIn" placeholder="Hours slept">
+      <button onclick="logSleep()">Save</button>
+    </div>
+    <div class="flbl" style="margin:14px 4px 0">Energy today</div>
+    <div class="engrid" id="energyGrid"></div>
+    <div class="trknote" id="sleepNote"></div>
+  </div>
 </section>
 
 <!-- ============ PROGRESS ============ -->
@@ -620,6 +631,7 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
       <div class="qv" id="qtyVal">1</div>
       <button onclick="bumpQty(.5)">+</button>
     </div>
+    <div class="segs qtypresets" id="qtyPresets"></div>
     <div class="qtymac" id="qtyMac"></div>
     <button class="confirm" id="confirmBtn" onclick="confirmSheet()">Add</button>
     <button class="ghostbtn" id="removeBtn" style="display:none" onclick="removeEntry()">Remove from log</button>
@@ -705,7 +717,77 @@ const DB=[
  ["Orange juice",112,2,26,0,"1 cup"],["Cold drink/soda",140,0,39,0,"1 can"],["Beer",153,2,13,0,"1 can"],
  ["Wine",125,0,4,0,"5 oz"],["Lassi sweet",150,5,22,4,"1 glass"],["Filter coffee w/ sugar",90,2,14,3,"1 cup"],
  ["Masala chai",80,2,12,3,"1 cup"],["Protein bar",200,20,22,7,"1 bar"],["Dark chocolate",170,2,13,12,"30g"],
- ["Seven Sundays cocoa cereal",160,4,26,5,"1 cup (40g)"]
+ ["Seven Sundays cocoa cereal",160,4,26,5,"1 cup (40g)"],
+ /* ---- fruit juices (≈1 glass / 250 ml) ---- */
+ ["Apple juice",114,0,28,0,"1 glass"],["Pomegranate juice",134,1,33,1,"1 glass"],["Mango juice",128,1,33,0,"1 glass"],
+ ["Grape juice",152,1,37,0,"1 glass"],["Cranberry juice",116,0,31,0,"1 glass"],["Pineapple juice",130,1,32,0,"1 glass"],
+ ["Watermelon juice",96,2,24,0,"1 glass"],["Sugarcane juice",180,0,45,0,"1 glass"],["Mosambi juice",100,1,24,0,"1 glass"],
+ ["Carrot juice",94,2,22,0,"1 glass"],["ABC juice (apple-beet-carrot)",110,2,26,0,"1 glass"],["Beetroot juice",110,2,25,0,"1 glass"],
+ ["Amla juice",30,0,7,0,"1 shot 60ml"],["Guava juice",120,1,30,0,"1 glass"],["Tomato juice (fresh)",41,2,9,0,"1 glass"],
+ ["Mixed fruit juice",130,1,32,0,"1 glass"],["Lemonade / Nimbu pani",99,0,26,0,"1 glass"],["Sweet lime soda",110,0,28,0,"1 glass"],
+ ["Aam panna",120,0,30,0,"1 glass"],["Jamun juice",90,1,22,0,"1 glass"],["Kiwi juice",110,1,27,0,"1 glass"],
+ ["Cucumber juice",45,2,9,0,"1 glass"],["Green veggie juice",80,3,15,0,"1 glass"],["Lychee juice",125,0,31,0,"1 glass"],
+ ["Pear juice",120,0,30,0,"1 glass"],["Cold-pressed green juice",90,2,18,0,"1 glass"],["Muskmelon juice",80,1,19,0,"1 glass"],
+ /* ---- fast food / Western ---- */
+ ["Cheeseburger",300,15,33,12,"1"],["Hamburger",250,12,31,9,"1"],["Veg burger",290,9,42,9,"1"],
+ ["Chicken burger",350,18,38,14,"1"],["French fries",365,4,48,17,"medium"],["Pizza slice cheese",285,12,36,10,"1 slice"],
+ ["Pizza slice pepperoni",313,13,36,13,"1 slice"],["Hot dog",290,10,23,17,"1"],["Chicken nuggets (6)",280,14,16,18,"6"],
+ ["Grilled chicken sandwich",350,28,38,9,"1"],["Club sandwich",600,30,45,33,"1"],["Veg sandwich",250,8,38,7,"1"],
+ ["Burrito",450,20,55,15,"1"],["Taco",170,8,13,9,"1"],["Quesadilla",500,22,40,28,"1"],
+ ["Pasta marinara",220,8,43,3,"1 cup"],["Pasta alfredo",420,12,45,21,"1 cup"],["Mac & cheese",310,11,39,12,"1 cup"],
+ ["Ramen noodles",380,10,52,14,"1 pack"],["Fried rice",330,8,52,10,"1 cup"],["Hakka noodles",310,8,50,9,"1 cup"],
+ ["Spring roll veg",120,3,15,5,"1"],["Garlic bread",200,5,26,8,"2 pcs"],["Nachos",340,5,38,19,"1 plate"],
+ /* ---- Indian mains & tiffins ---- */
+ ["Samosa",260,4,30,14,"1"],["Pakora / Bhaji",170,4,15,11,"100g"],["Pav bhaji",400,9,55,16,"1 plate"],
+ ["Vada pav",290,7,42,10,"1"],["Chole bhature",450,12,55,20,"1 plate"],["Aloo paratha",260,6,36,10,"1"],
+ ["Paneer paratha",300,11,34,13,"1"],["Naan",260,9,45,5,"1"],["Butter naan",310,8,45,11,"1"],
+ ["Chapati (2)",200,6,40,2,"2"],["Idli sambar (2)",220,7,40,3,"plate"],["Medu vada (2)",260,6,30,14,"2"],
+ ["Uttapam",180,5,30,5,"1"],["Rava dosa",170,3,26,6,"1"],["Set dosa (2)",200,5,34,5,"2"],
+ ["Bisi bele bath",280,9,45,7,"1 cup"],["Curd rice",250,6,40,7,"1 cup"],["Lemon rice",210,4,38,5,"1 cup"],
+ ["Tamarind rice",230,4,40,6,"1 cup"],["Tomato rice",220,4,40,5,"1 cup"],["Veg pulao",250,6,42,7,"1 cup"],
+ ["Jeera rice",230,4,42,5,"1 cup"],["Egg fried rice",340,12,48,11,"1 cup"],["Chicken biryani",350,18,45,12,"1 cup"],
+ ["Veg biryani",290,7,48,8,"1 cup"],["Vermicelli upma",200,5,35,5,"1 cup"],["Daliya / broken wheat",150,5,30,1,"1 cup"],
+ ["Ragi mudde",130,3,28,1,"1"],
+ /* ---- proteins ---- */
+ ["Scrambled eggs (2)",200,14,2,15,"2 eggs"],["Egg curry (2 eggs)",280,14,8,20,"1 cup"],["Chicken tikka",190,28,4,7,"100g"],
+ ["Tandoori chicken",175,26,2,7,"100g"],["Butter chicken",330,20,8,24,"1 cup"],["Chicken 65",280,22,12,16,"100g"],
+ ["Fish fry",200,22,6,10,"1 pc"],["Prawn curry",180,18,6,9,"1 cup"],["Keema",260,20,5,18,"1 cup"],
+ ["Boiled egg whites (3)",51,11,0,0,"3"],["Sausage",170,9,1,15,"1 link"],["Bacon (2)",90,6,0,7,"2 strips"],
+ ["Ham slice",30,5,1,1,"1 slice"],["Turkey breast",104,17,4,2,"100g"],["Canned tuna",100,22,0,1,"100g"],
+ /* ---- dals & legumes ---- */
+ ["Moong dal",150,10,24,2,"1 cup"],["Toor dal",170,11,28,3,"1 cup"],["Masoor dal",160,11,26,2,"1 cup"],
+ ["Dal makhani",280,12,30,13,"1 cup"],["Black chana curry",200,11,30,5,"1 cup"],["Lobia / black-eyed peas",160,9,28,2,"1 cup"],
+ ["Sprouts salad",120,8,20,1,"1 cup"],
+ /* ---- veg dishes ---- */
+ ["Aloo gobi",150,4,18,8,"1 cup"],["Bhindi fry",130,3,12,9,"1 cup"],["Baingan bharta",120,3,12,7,"1 cup"],
+ ["Palak paneer",230,12,10,16,"1 cup"],["Cabbage poriyal",90,3,10,5,"1 cup"],["Beans poriyal",100,4,12,5,"1 cup"],
+ ["Avial",150,4,12,10,"1 cup"],["Cauliflower roast",80,3,9,4,"1 cup"],["Mushroom masala",140,5,12,8,"1 cup"],
+ /* ---- fruits ---- */
+ ["Pear",100,1,27,0,"1"],["Peach",59,1,14,0,"1"],["Plum",30,0,8,0,"1"],["Kiwi",42,1,10,0,"1"],
+ ["Cherries",87,1,22,0,"1 cup"],["Fig fresh",37,0,10,0,"1"],["Sapota / Chikoo",83,0,20,1,"1"],
+ ["Custard apple",100,2,24,0,"1/2 cup"],["Jackfruit",155,2,40,1,"1 cup"],["Lychee",66,1,17,0,"1/2 cup"],
+ ["Dragon fruit",60,1,13,0,"1 cup"],["Muskmelon",54,1,13,0,"1 cup"],
+ /* ---- snacks & sweets ---- */
+ ["Potato chips",150,2,15,10,"28g"],["Pretzels",110,3,23,1,"28g"],["Crackers",70,1,11,2,"5"],
+ ["Cookies (2)",140,2,20,6,"2"],["Brownie",230,3,32,11,"1"],["Donut",250,3,31,12,"1"],
+ ["Ice cream",210,4,24,11,"1 scoop"],["Gulab jamun (2)",300,4,52,9,"2"],["Rasgulla (2)",190,4,40,2,"2"],
+ ["Jalebi",150,1,30,4,"1"],["Ladoo",185,3,25,8,"1"],["Barfi",170,3,22,8,"1 pc"],["Kheer",250,6,40,7,"1 cup"],
+ ["Halwa",280,4,40,12,"1 cup"],["Mysore pak",210,2,22,13,"1 pc"],["Chocolate bar",230,3,26,13,"1 bar"],
+ ["Muffin",380,5,55,15,"1"],["Croissant",230,5,26,12,"1"],["Cake slice",350,4,50,15,"1 slice"],
+ /* ---- beverages ---- */
+ ["Cappuccino",120,6,12,5,"1 cup"],["Latte",150,8,13,7,"1 cup"],["Cold coffee",180,5,28,6,"1 glass"],
+ ["Hot chocolate",190,8,27,6,"1 cup"],["Iced tea",90,0,23,0,"1 glass"],["Energy drink",110,0,28,0,"1 can"],
+ ["Sports drink",80,0,21,0,"1 bottle"],["Fruit smoothie",200,4,40,3,"1 glass"],["Banana shake",220,6,38,5,"1 glass"],
+ ["Mango shake",250,6,45,5,"1 glass"],["Chocolate milkshake",350,9,50,12,"1 glass"],["Badam milk",180,6,24,7,"1 glass"],
+ ["Sweet lassi",180,6,28,5,"1 glass"],["Salt lassi",100,5,8,5,"1 glass"],["Diet soda",0,0,0,0,"1 can"],
+ /* ---- grains & breads ---- */
+ ["Multigrain bread",90,4,15,2,"1 slice"],["Bagel",250,10,48,2,"1"],["English muffin",130,5,25,1,"1"],
+ ["Couscous",176,6,36,0,"1 cup"],["Millet cooked",120,4,24,1,"1/2 cup"],
+ /* ---- condiments & fats ---- */
+ ["Mayonnaise",90,0,0,10,"1 tbsp"],["Ketchup",20,0,5,0,"1 tbsp"],["Mustard",10,1,1,0,"1 tbsp"],
+ ["Olive oil",119,0,0,14,"1 tbsp"],["Coconut oil",117,0,0,14,"1 tbsp"],["Pickle / Achar",30,0,2,2,"1 tbsp"],
+ ["Hummus",70,2,4,5,"2 tbsp"],["Salsa",10,0,2,0,"2 tbsp"],["Soy sauce",8,1,1,0,"1 tbsp"],
+ ["Schezwan sauce",40,1,5,2,"1 tbsp"],["Jam",56,0,14,0,"1 tbsp"],["Cream cheese",50,1,1,5,"1 tbsp"]
 ];
 const SNACKS=[
  ["Whey shake in water",120,25,"Fastest 25g protein, near-zero effort"],
@@ -1139,8 +1221,14 @@ function openQtyStep(f){
   if(sheetMode==='add')openSheetUI();
 }
 function bumpQty(d){curQty=Math.max(.5,Math.round((curQty+d)*2)/2);updateQty();}
+const QTY_PRESETS=[.5,1,1.5,2,3];
+function setQty(v){curQty=v;updateQty();}
+function renderQtyPresets(){
+  el('qtyPresets').innerHTML=QTY_PRESETS.map(v=>`<button class="${v===curQty?'sel':''}" onclick="setQty(${v})">${v}\u00d7</button>`).join('');
+}
 function updateQty(){
   el('qtyVal').textContent=curQty;
+  renderQtyPresets();
   const f=curFood;
   el('qtyMac').textContent=`${Math.round(f[1]*curQty)} kcal · ${Math.round(f[2]*curQty)}p ${Math.round(f[3]*curQty)}c ${Math.round(f[4]*curQty)}f`;
 }

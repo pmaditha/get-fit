@@ -205,6 +205,22 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
 .startedit input:focus{border-color:var(--gold)}
 .empty{text-align:center;color:var(--mut2);font-size:13px;padding:18px 6px;line-height:1.5}
 
+/* water + cardio trackers */
+.trk-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.trk-head h2{font-size:16px}
+.trk-val{font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--gold2)}
+.wdots{display:flex;flex-wrap:wrap;gap:7px}
+.wdot{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line2);background:rgba(255,255,255,.04);
+   display:flex;align-items:center;justify-content:center;font-size:13px;color:#06291a;transition:transform .15s var(--ease),background .2s}
+.wdot:active{transform:scale(.82)}
+.wdot.on{background:linear-gradient(135deg,#6cb6d9,#a6d9ef);border-color:transparent}
+.trkbtns{display:flex;gap:8px;margin-top:13px}
+.trkbtns button{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--line2);color:var(--txt);
+   font-weight:600;font-size:13px;padding:11px;border-radius:12px;transition:transform .15s var(--ease),background .2s}
+.trkbtns button:active{transform:scale(.94);background:rgba(233,185,73,.14)}
+.trkbtns button.minus{flex:0 0 46px;color:var(--berry)}
+.trknote{font-size:11.5px;color:var(--mut2);margin-top:11px;line-height:1.45}
+
 /* ============================================================
    tab bar
    ============================================================ */
@@ -311,6 +327,27 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
 
   <div class="card phasecard" id="phaseStrip"></div>
 
+  <div class="card">
+    <div class="trk-head"><h2>Water</h2><div class="trk-val" id="waterVal">0 / 8</div></div>
+    <div class="wdots" id="waterDots"></div>
+    <div class="trkbtns">
+      <button class="minus" onclick="bumpWater(-1)">−</button>
+      <button onclick="bumpWater(1)">+ Glass (250 ml)</button>
+    </div>
+    <div class="trknote" id="waterNote"></div>
+  </div>
+
+  <div class="card">
+    <div class="trk-head"><h2>Cardio</h2><div class="trk-val" id="cardioVal">0 min</div></div>
+    <div class="trkbtns">
+      <button class="minus" onclick="bumpCardio(-5)">−5</button>
+      <button onclick="bumpCardio(10)">+10</button>
+      <button onclick="bumpCardio(20)">+20</button>
+      <button onclick="bumpCardio(30)">+30</button>
+    </div>
+    <div class="trknote" id="cardioNote"></div>
+  </div>
+
   <div class="card" id="quickCard">
     <div class="qahead">
       <h2 style="font-size:17px">Quick add</h2>
@@ -390,6 +427,10 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
 <!-- ============ INSIGHTS ============ -->
 <section class="screen" id="s-insights">
   <header class="top"><div><div class="eyebrow">Trends &amp; insights</div><div class="date">Insights</div></div></header>
+  <div class="card" id="checkinCard">
+    <h2>Weekly check-in</h2><div class="sub">Your last 7 days at a glance</div>
+    <div id="checkinBox"></div>
+  </div>
   <div class="card">
     <h2>Weight trend</h2><div class="sub">Smoothed trend cuts through daily water-weight noise</div>
     <div class="trendrow" id="trendRow"></div>
@@ -581,9 +622,11 @@ const PLAN_WEEKS=13, START=78, GOAL=68;
 const HEIGHT_CM=173, AGE=32, ACTIVITY=1.45, KCAL_PER_KG=7700;
 const EMA_ALPHA=0.25;          // ~7-point smoothing for the trend line
 const PRO_HIT=135;             // 90% of 150g counts as a protein "hit"
+const WATER_GOAL=8;            // glasses (250 ml each) = 2 L baseline
+const CARDIO_KCAL_MIN=9;       // rough treadmill burn per minute
 
 /* ---------------- STORE ---------------- */
-const KEY={logs:'lp_logs',weights:'lp_weights',workouts:'lp_workouts',custom:'lp_custom',fav:'lp_fav',start:'lp_start'};
+const KEY={logs:'lp_logs',weights:'lp_weights',workouts:'lp_workouts',custom:'lp_custom',fav:'lp_fav',start:'lp_start',water:'lp_water',cardio:'lp_cardio'};
 function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 const S={
@@ -592,6 +635,8 @@ const S={
   workouts:load(KEY.workouts,[]),// [dateStrings]
   custom:load(KEY.custom,[]),   // [[name,cal,pro,carb,fat,srv]]
   fav:load(KEY.fav,[]),         // [[name,cal,pro,carb,fat,srv]]
+  water:load(KEY.water,{}),     // {date:glasses}
+  cardio:load(KEY.cardio,{}),   // {date:minutes}
   start:load(KEY.start,null)    // 'YYYY-MM-DD'
 };
 let ALLFOODS=DB.concat(S.custom);
@@ -684,6 +729,8 @@ function renderToday(){
   renderPhaseStrip(T,ph,wk);
   renderQuickAdd();
   renderMeals();
+  renderWater();
+  renderCardio();
 }
 function renderPhaseStrip(T,ph,wk){
   const wkIn=Math.min(wk,PLAN_WEEKS),prog=Math.min(wk/PLAN_WEEKS,1)*100;
@@ -765,6 +812,28 @@ function delItem(i){
   todayList().splice(i,1);persist('logs');renderToday();
   toast('Removed '+removed.n,'Undo',()=>{todayList().splice(i,0,removed);persist('logs');renderToday();});
 }
+
+/* ---------------- WATER + CARDIO ---------------- */
+function renderWater(){
+  const n=S.water[todayKey()]||0;
+  el('waterVal').textContent=n+' / '+WATER_GOAL;
+  let dots='';for(let i=0;i<Math.max(WATER_GOAL,n);i++)dots+=`<div class="wdot ${i<n?'on':''}" onclick="setWater(${i+1})">${i<n?'\u2713':''}</div>`;
+  el('waterDots').innerHTML=dots;
+  const ml=n*250;
+  el('waterNote').textContent=n>=WATER_GOAL
+    ? `Goal hit — ${(ml/1000).toFixed(1)} L today. Hydration blunts hunger.`
+    : `${(ml/1000).toFixed(2)} L so far · ${(WATER_GOAL-n)*250} ml to your ${WATER_GOAL*250/1000} L goal`;
+}
+function bumpWater(d){const k=todayKey();S.water[k]=Math.max(0,(S.water[k]||0)+d);persist('water');renderWater();}
+function setWater(v){const k=todayKey();S.water[k]=((S.water[k]||0)===v)?v-1:v;persist('water');renderWater();}
+function renderCardio(){
+  const m=S.cardio[todayKey()]||0;
+  el('cardioVal').textContent=m+' min';
+  el('cardioNote').textContent=m>0
+    ? `≈ ${Math.round(m*CARDIO_KCAL_MIN)} kcal burned — counted in your weekly check-in.`
+    : 'Treadmill or any cardio. Tap to log today\u2019s minutes.';
+}
+function bumpCardio(d){const k=todayKey();S.cardio[k]=Math.max(0,(S.cardio[k]||0)+d);persist('cardio');renderCardio();}
 
 /* ---------------- SHEET (add / edit) ---------------- */
 let curMeal='Breakfast',curFood=null,curQty=1,sheetMode='add',editIdx=-1;
@@ -922,8 +991,40 @@ function renderCoach(){
 }
 
 /* ---------------- INSIGHTS ---------------- */
-function renderInsights(){renderWeightChart();renderDeficit();renderProtein();renderWeekly();renderCorrelation();
+function renderInsights(){renderCheckin();renderWeightChart();renderDeficit();renderProtein();renderWeekly();renderCorrelation();
   const si=el('startInput');if(si)si.value=S.start;}
+function renderCheckin(){
+  const box=el('checkinBox');
+  const t=new Date(),last7=[];
+  for(let i=0;i<7;i++){const d=new Date(t);d.setDate(d.getDate()-i);last7.push(d.toISOString().slice(0,10));}
+  let calSum=0,calN=0,proHits=0,waterSum=0,waterN=0,cardioSum=0,woN=0;
+  last7.forEach(d=>{
+    if((S.logs[d]||[]).length){const dt=dayTot(d);calSum+=dt.cal;calN++;if(dt.pro>=PRO_HIT)proHits++;}
+    if(S.water[d]!=null){waterSum+=S.water[d];waterN++;}
+    cardioSum+=S.cardio[d]||0;
+    if(S.workouts.includes(d))woN++;
+  });
+  if(!calN&&!waterN&&!cardioSum&&!woN){box.innerHTML='<div class="empty">Log meals, water, cardio or workouts this week and your check-in summary appears here.</div>';return;}
+  const avgCal=calN?Math.round(calSum/calN):0;
+  const proRate=calN?Math.round(proHits/calN*100):0;
+  const avgWater=waterN?waterSum/waterN:0;
+  const wWin=S.weights.filter(w=>last7.includes(w.date)).sort((a,b)=>a.date<b.date?-1:1);
+  let wChange=null;if(wWin.length>=2)wChange=+(wWin[wWin.length-1].w-wWin[0].w).toFixed(1);
+  const T=getTarget();
+  const grid=`<div class="stat-grid">
+      <div class="stat"><div class="v">${wChange===null?'—':(wChange>0?'+':'')+wChange}<small style="font-size:13px">kg</small></div><div class="k">Weight (7d)</div></div>
+      <div class="stat"><div class="v">${avgCal||'—'}</div><div class="k">Avg calories</div></div>
+      <div class="stat"><div class="v">${proRate}<small style="font-size:13px">%</small></div><div class="k">Protein hit-rate</div></div>
+      <div class="stat"><div class="v">${woN}</div><div class="k">Workouts</div></div>
+    </div>`;
+  let head,rec;
+  if(calN&&proRate<60){head='Focus: protein';rec=`You hit 135g+ protein on only <b>${proRate}%</b> of logged days. Front-load whey or eggs at breakfast — it\u2019s your fastest lever.`;}
+  else if(waterN&&avgWater<WATER_GOAL*0.7){head='Focus: hydration';rec=`Averaging <b>${avgWater.toFixed(1)}</b> glasses/day. Aim for <b>${WATER_GOAL}</b> — it blunts hunger and helps you hold the deficit.`;}
+  else if(calN&&avgCal>T.cal+100){head='Focus: portions';rec=`Average intake <b>${avgCal}</b> is above your <b>${T.cal}</b> target. Trim one snack or swap to leaner picks.`;}
+  else if(wChange!==null&&wChange>=0){head='Focus: tighten up';rec=`Weight is flat or up this week. Hold meals at <b>${T.cal} kcal</b>, keep protein high, and add a couple cardio sessions.`;}
+  else{head='On track';rec=`${wChange!==null&&wChange<0?`Down <b>${Math.abs(wChange)} kg</b> this week. `:''}Protein at <b>${proRate}%</b>, <b>${woN}</b> workouts${cardioSum?`, <b>${cardioSum}</b> min cardio`:''}. Keep doing exactly this.`;}
+  box.innerHTML=grid+`<div class="insight" style="margin-top:12px"><div class="ih">${head}</div>${rec}</div>`;
+}
 function renderWeightChart(){
   const box=el('weightChart'),proj=el('projMsg'),row=el('trendRow');
   if(S.weights.length<1){box.innerHTML='<div class="empty">Log your weight on the Progress tab to see your trend</div>';
@@ -1042,7 +1143,7 @@ function renderCorrelation(){
 
 /* ---------------- BACKUP ---------------- */
 function exportData(){
-  const data={version:3,exported:new Date().toISOString(),logs:S.logs,weights:S.weights,workouts:S.workouts,customFoods:S.custom,fav:S.fav,start:S.start};
+  const data={version:4,exported:new Date().toISOString(),logs:S.logs,weights:S.weights,workouts:S.workouts,customFoods:S.custom,fav:S.fav,water:S.water,cardio:S.cardio,start:S.start};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download='LeanPath-backup-'+todayKey()+'.json';
@@ -1055,9 +1156,9 @@ function importData(e){
     const d=JSON.parse(r.result);
     if(d.logs)S.logs=d.logs;if(d.weights)S.weights=d.weights;if(d.workouts)S.workouts=d.workouts;
     if(d.customFoods){S.custom=d.customFoods;ALLFOODS=DB.concat(S.custom);}
-    if(d.fav)S.fav=d.fav;if(d.start)S.start=d.start;
+    if(d.fav)S.fav=d.fav;if(d.water)S.water=d.water;if(d.cardio)S.cardio=d.cardio;if(d.start)S.start=d.start;
     if(!S.logs[todayKey()])S.logs[todayKey()]=[];
-    persist('logs');persist('weights');persist('workouts');persist('custom');persist('fav');persist('start');
+    persist('logs');persist('weights');persist('workouts');persist('custom');persist('fav');persist('water');persist('cardio');persist('start');
     renderToday();renderProgress();renderWorkout();renderInsights();
     el('backupMsg').textContent='Data restored.';
   }catch(err){el('backupMsg').textContent='Could not read that file. Make sure it\u2019s a LeanPath backup.';}};

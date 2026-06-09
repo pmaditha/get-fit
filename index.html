@@ -35,9 +35,11 @@ body{padding-top:var(--safe-top);padding-bottom:calc(94px + var(--safe-bot));min
 button{font-family:inherit;cursor:pointer;color:inherit}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
 
-.bgwrap{position:fixed;inset:0;z-index:-2;background:
-   radial-gradient(125% 80% at 82% -12%, #17694f 0%, transparent 56%),
+.bgwrap{position:fixed;inset:0;z-index:-2;overflow:hidden;background:
+   radial-gradient(125% 80% at 82% -12%, #1c7e5e 0%, transparent 56%),
    radial-gradient(105% 72% at -5% 112%, #0c4634 0%, transparent 52%),
+   radial-gradient(70% 55% at 100% 60%, rgba(181,139,214,.10), transparent 60%),
+   radial-gradient(70% 55% at 0% 30%, rgba(108,182,217,.08), transparent 60%),
    linear-gradient(180deg,#07271d,#051a13);}
 .grain{position:fixed;inset:0;z-index:-1;opacity:.045;pointer-events:none;
    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
@@ -59,8 +61,8 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;align-items:flex-end}
 .eyebrow{font-size:11.5px;color:var(--mut);letter-spacing:.14em;text-transform:uppercase;font-weight:600}
 .date{font-family:'Fraunces',serif;font-size:31px;font-weight:600;letter-spacing:-.02em;margin-top:3px}
-.badge{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#3a2c05;font-weight:700;
-   font-size:12px;padding:9px 14px;border-radius:30px;box-shadow:0 8px 22px rgba(233,185,73,.32)}
+.badge{background:linear-gradient(135deg,var(--gold),var(--mango),var(--gold2));background-size:180% 180%;color:#3a2c05;font-weight:700;
+   font-size:12px;padding:9px 14px;border-radius:30px;box-shadow:0 8px 22px rgba(233,185,73,.32);animation:glowPulse 3.4s ease-in-out infinite,slideGrad 7s linear infinite}
 
 /* ============================================================
    cards
@@ -305,6 +307,55 @@ header.top{padding:24px 4px 16px;display:flex;justify-content:space-between;alig
    padding:13px 16px;display:flex;align-items:center;gap:14px;box-shadow:var(--sh);max-width:420px;width:100%;font-size:13.5px}
 .toastbox span{flex:1}
 .toastbox button{background:none;border:none;color:var(--gold2);font-weight:700;font-size:13.5px;white-space:nowrap}
+
+/* ============================================================
+   colorful flourishes + extra motion
+   ============================================================ */
+@keyframes floatBlob{0%{transform:translate(0,0) scale(1)}33%{transform:translate(6%,-5%) scale(1.08)}66%{transform:translate(-5%,4%) scale(.96)}100%{transform:translate(0,0) scale(1)}}
+@keyframes shimmer{0%{transform:translateX(-120%)}100%{transform:translateX(240%)}}
+@keyframes slideGrad{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes glowPulse{0%,100%{box-shadow:0 8px 22px rgba(233,185,73,.32)}50%{box-shadow:0 10px 34px rgba(245,158,60,.6)}}
+@keyframes ringGlow{0%,100%{filter:drop-shadow(0 0 6px rgba(233,185,73,.4))}50%{filter:drop-shadow(0 0 18px rgba(245,158,60,.65))}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes flamePulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 rgba(245,158,60,0))}50%{transform:scale(1.22);filter:drop-shadow(0 0 7px rgba(245,158,60,.85))}}
+@keyframes sheen{0%{left:-60%}55%,100%{left:150%}}
+@keyframes popIn{0%{opacity:0;transform:scale(.8) translateY(8px)}60%{opacity:1;transform:scale(1.06)}100%{transform:scale(1) translateY(0)}}
+
+/* floating colorful blobs behind everything */
+.bgwrap::before,.bgwrap::after{content:"";position:absolute;border-radius:50%;filter:blur(64px);opacity:.45;mix-blend-mode:screen;pointer-events:none}
+.bgwrap::before{width:58vw;height:58vw;left:-14vw;top:6vh;background:radial-gradient(circle,#22a079,transparent 68%);animation:floatBlob 24s ease-in-out infinite}
+.bgwrap::after{width:50vw;height:50vw;right:-16vw;bottom:2vh;background:radial-gradient(circle,#d6a93f,transparent 70%);animation:floatBlob 30s ease-in-out infinite reverse}
+
+/* animated rainbow card top edge + soft sheen sweep */
+.card::before{height:2px!important;background:linear-gradient(90deg,var(--gold),var(--leaf),var(--sky),var(--violet),var(--mango),var(--gold))!important;
+   background-size:300% 100%!important;animation:slideGrad 9s linear infinite;opacity:.95}
+.card::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:42%;
+   background:linear-gradient(100deg,transparent,rgba(255,255,255,.09),transparent);transform:skewX(-18deg);pointer-events:none;animation:sheen 9s ease-in-out 1.4s infinite}
+
+/* glowing calorie ring + gently floating number */
+.ring svg{animation:ringGlow 3.8s ease-in-out infinite}
+.ring .big{animation:floatY 3.2s ease-in-out infinite}
+
+/* shimmering progress fills */
+.bar i,.wkbar i,.progress-big .track i,.barlite i{position:relative;overflow:hidden}
+.bar i::after,.wkbar i::after,.progress-big .track i::after,.barlite i::after{content:"";position:absolute;inset:0;
+   background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-120%);animation:shimmer 2.8s ease-in-out infinite}
+
+/* animated gradient on primary buttons */
+.confirm,.wt-input button,.jumptoday,.food .fadd{background-size:180% 180%;animation:slideGrad 6s linear infinite}
+
+/* tab bar active pop + glowing indicator */
+.tab.active svg{animation:floatY 2.2s ease-in-out infinite;filter:drop-shadow(0 2px 9px rgba(242,205,107,.55))}
+.tabind{box-shadow:0 0 12px rgba(242,205,107,.85)}
+
+/* lively chips, pills, dots */
+.chip:hover{background:rgba(233,185,73,.12);border-color:rgba(242,205,107,.4)}
+.wdot.on{animation:popIn .4s var(--spring) both}
+.engrid button.sel{animation:popIn .4s var(--spring) both}
+.pacepill.ok{animation:glowPulse 3.6s ease-in-out infinite}
+
+/* streak flame */
+.flame{display:inline-block;animation:flamePulse 1.7s ease-in-out infinite}
 
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;transition-duration:.01ms!important}
@@ -828,7 +879,7 @@ function renderToday(){
   renderFast();
   renderSleep();
   const st=logStreak();
-  el('todayEyebrow').innerHTML=isToday()?(st>=2?`Today · 🔥 ${st}-day streak`:'Today'):'Editing past day';
+  el('todayEyebrow').innerHTML=isToday()?(st>=2?`Today · <span class="flame">🔥</span> ${st}-day streak`:'Today'):'Editing past day';
 }
 function renderDateNav(){
   el('jumpToday').style.display=isToday()?'none':'';

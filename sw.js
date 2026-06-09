@@ -1,6 +1,6 @@
 /* LeanPath service worker — offline-first for the single-page app.
    Bump CACHE when you change index.html so clients pick up the update. */
-const CACHE = 'leanpath-v2';
+const CACHE = 'leanpath-v4';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {

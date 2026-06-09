@@ -1,0 +1,19 @@
+{
+  "name": "LeanPath",
+  "short_name": "LeanPath",
+  "description": "Personal fat-loss tracker — meals, weight, workouts and insights.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07271d",
+  "theme_color": "#07271d",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Crect width='512' height='512' rx='112' fill='%2307271d'/%3E%3Ccircle cx='256' cy='256' r='150' fill='none' stroke='%23e9b949' stroke-width='34'/%3E%3Cpath d='M182 262l50 50 96-112' fill='none' stroke='%235bbf7a' stroke-width='34' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
